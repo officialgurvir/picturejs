@@ -2,11 +2,8 @@ const image = new PictureJS.ImageUrlRenderer(
     'https://picsum.photos/500'
 );
 
-image.headlessRender();
-
-const imageData = new PictureJS.ImageDataRenderer(
-    image.crop(100, 100, 400, 400)
-);
-
-imageData.container = document.querySelector('.img');
-imageData.render();
+image.crop(0, 0, 500, 500).then(data => {
+    let croppedImage = new PictureJS.ImageDataRenderer(data);
+    croppedImage.container = document.querySelector('.img');
+    croppedImage.render();
+})

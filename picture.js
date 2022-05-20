@@ -17,7 +17,10 @@ const PictureJS = (function (window, document) {
     }
 
     crop(fx, fy, tx, ty) {
-      return this._context.getImageData(fx, fy, tx, ty);
+      return this.headlessRender().then(() => {
+        return this._context.getImageData(fx, fy, tx, ty);
+      })
+      
     }
   }
 
@@ -30,27 +33,41 @@ const PictureJS = (function (window, document) {
       this._image = new Image();
       this._image.src = imageURL;
       this._image.crossOrigin = "Anonymous";
+
+      this._imageURL = imageURL;
     }
 
     headlessRender() {
-      this._image.onload = () => {
-        this._canvas.width = this._image.width;
-        this._canvas.height = this._image.height;
+      return new Promise(resolve => {
+        this._image.onload = () => {
+          this._canvas.width = this._image.width;
+          this._canvas.height = this._image.height;
+          
+          this._context.clearRect(
+            0,0,
+            this._canvas.width,
+            this._canvas.height
+          )
 
-        this._context.drawImage(
-          this._image,
-          0,0,
-          this._canvas.width,
-          this._canvas.height
-        );
-      }
+          this._context.drawImage(
+            this._image,
+            0,0,
+            this._canvas.width,
+            this._canvas.height
+          );
+          
+          resolve();
+        }
+      });
     }
 
-    render() {
-      this.headlessRender();
-      this._container.appendChild(
+    /**
+     * @property
+     */
+    get render() {
+      return this.headlessRender().then(() => this._container.appendChild(
         this._canvas
-      );
+      ));
     }
   }
 
@@ -67,11 +84,15 @@ const PictureJS = (function (window, document) {
       this._canvas.width = this._imageData.width;
       this._canvas.height = this._imageData.height;
 
-      this._context.putImageData(this._imageData);
+      this._context.putImageData(
+        this._imageData,
+        0,0
+      );
     }
 
     render()  {
-      this._container.appendChild(this._container);
+      this.headlessRender();
+      this._container.appendChild(this._canvas);
     }
   }
 
