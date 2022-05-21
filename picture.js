@@ -81,32 +81,7 @@ const PictureJS = (function (window, document) {
     }
   }
 
-  class ImageDataRenderer extends ImageRenderer {
-    _imageData;
-
-    constructor(imageData) {
-      super();
-
-      this._imageData = imageData;
-    }
-
-    headlessRender() {
-      this._canvas.width = this._imageData.width;
-      this._canvas.height = this._imageData.height;
-
-      this._context.putImageData(
-        this._imageData,
-        0,0
-      );
-    }
-
-    render()  {
-      this.headlessRender();
-      this._container.appendChild(this._canvas);
-    }
-  }
-
   return {
-    ImageUrlRenderer,
+    ImageUrlRenderer
   }
 })(window, document);
