@@ -17,10 +17,23 @@ const PictureJS = (function (window, document) {
     }
 
     crop(fx, fy, tx, ty) {
-      return this.headlessRender().then(() => {
-        return this._context.getImageData(fx, fy, tx, ty);
-      })
-      
+      let data = this._context.getImageData(fx, fy, tx, ty);
+      this._context.clearRect(
+        0,0,
+        this._canvas.width,
+        this._canvas.height
+      );
+
+      this._context.putImageData(data, 0, 0);
+    }
+
+    download(mimetype = "png") {
+      let a = document.createElement('a');
+      a.target = "_blank";
+      a.download = `image.${mimetype}`
+      a.href = this._canvas.toDataURL(`image/${mimetype}`);
+
+      a.click();
     }
   }
 
@@ -61,10 +74,7 @@ const PictureJS = (function (window, document) {
       });
     }
 
-    /**
-     * @property
-     */
-    get render() {
+    render() {
       return this.headlessRender().then(() => this._container.appendChild(
         this._canvas
       ));
@@ -98,6 +108,5 @@ const PictureJS = (function (window, document) {
 
   return {
     ImageUrlRenderer,
-    ImageDataRenderer
   }
 })(window, document);
